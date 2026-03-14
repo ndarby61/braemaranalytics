@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darby Family Heritage Hub - Ancestry References</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f7;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .serif {
+            font-family: 'Crimson Pro', serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .link-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .link-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .category-badge {
+            transition: all 0.2s ease;
+        }
+        .category-badge:hover {
+            transform: scale(1.05);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tree-bg {
+            background: linear-gradient(135deg, #f5f5f4 0%, #e7e5e4 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-stone-800">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 glass border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-amber-700 rounded-lg text-white">
+                        <i data-lucide="git-branch" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold serif text-stone-900">Family Heritage Hub</h1>
+                        <p class="text-sm text-stone-600 hidden sm:block">Your personal ancestry research collection</p>
+                    </div>
+                </div>
+                <button onclick="openModal()" class="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-lg shadow-amber-700/20">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    <span class="hidden sm:inline font-medium">Add Reference</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Stats & Search -->
+        <div class="mb-8 space-y-4">
+            <div class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+                <div class="flex items-center gap-4 text-sm text-stone-600">
+                    <span class="flex items-center gap-2">
+                        <i data-lucide="link" class="w-4 h-4"></i>
+                        <span id="totalLinks">0 references</span>
+                    </span>
+                    <span class="flex items-center gap-2">
+                        <i data-lucide="folder" class="w-4 h-4"></i>
+                        <span id="totalCategories">0 categories</span>
+                    </span>
+                </div>
+                <div class="relative w-full sm:w-96">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-5 h-5"></i>
+                    <input type="text" id="searchInput" placeholder="Search references..." 
+                        class="w-full pl-10 pr-4 py-2 rounded-lg border border-stone-300 focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20 outline-none transition-all bg-white/80"
+                        onkeyup="filterLinks()">
+                </div>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="flex flex-wrap gap-2" id="categoryFilters">
+                <button onclick="filterByCategory('all')" class="category-badge px-4 py-1.5 rounded-full text-sm font-medium bg-amber-700 text-white shadow-md" data-category="all">
+                    All References
+                </button>
+                <button onclick="filterByCategory('census')" class="category-badge px-4 py-1.5 rounded-full text-sm font-medium bg-white text-stone-700 border border-stone-300 hover:border-amber-700 hover:text-amber-700" data-category="census">
+                    Census Records
+                </button>
+                <button onclick="filterByCategory('bmd')" class="category-badge px-4 py-1.5 rounded-full text-sm font-medium bg-white text-stone-700 border border-stone-300 hover:border-amber-700 hover:text-amber-700" data-category="bmd">
+                    Birth, Marriage & Death
+                </button>
+                <button onclick="filterByCategory('immigration')" class="category-badge px-4 py-1.5 rounded-full text-sm font-medium bg-white text-stone-700 border border-stone-300 hover:border-amber-700 hover:text-amber-700" data-category="immigration">
+                    Immigration
+                </button>
+                <button onclick="filterByCategory('military')" class="category-badge px-4 py-1.5 rounded-full text-sm font-medium bg-white text-stone-700 border border-stone-300 hover:border-amber-700 hover:text-amber-700" data-category="military">
+                    Military
+                </button>
+                <button onclick="filterByCategory('dna')" class="category-badge px-4 py-1.5 rounded-full text-sm font-medium bg-white text-stone-700 border border-stone-300 hover:border-amber-700 hover:text-amber-700" data-category="dna">
+                    DNA & Genetics
+                </button>
+                <button onclick="filterByCategory('newspapers')" class="category-badge px-4 py-1.5 rounded-full text-sm font-medium bg-white text-stone-700 border border-stone-300 hover:border-amber-700 hover:text-amber-700" data-category="newspapers">
+                    Newspapers
+                </button>
+                <button onclick="filterByCategory('other')" class="category-badge px-4 py-1.5 rounded-full text-sm font-medium bg-white text-stone-700 border border-stone-300 hover:border-amber-700 hover:text-amber-700" data-category="other">
+                    Other
+                </button>
+            </div>
+        </div>
+
+        <!-- Links Grid -->
+        <div id="linksContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Links will be injected here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-20">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-stone-200 mb-4">
+                <i data-lucide="link-2" class="w-10 h-10 text-stone-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold serif text-stone-900 mb-2">No references yet</h3>
+            <p class="text-stone-600 mb-6 max-w-md mx-auto">Start building your family history collection by adding your first ancestry reference link.</p>
+            <button onclick="openModal()" class="bg-amber-700 hover:bg-amber-800 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                Add Your First Reference
+            </button>
+        </div>
+    </main>
+
+    <!-- Add/Edit Modal -->
+    <div id="modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-stone-900/50 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto fade-in">
+                <div class="p-6 border-b border-stone-200 flex justify-between items-center">
+                    <h2 class="text-2xl font-bold serif text-stone-900" id="modalTitle">Add Reference</h2>
+                    <button onclick="closeModal()" class="p-2 hover:bg-stone-100 rounded-full transition-colors">
+                        <i data-lucide="x" class="w-5 h-5 text-stone-500"></i>
+                    </button>
+                </div>
+                <form id="linkForm" onsubmit="saveLink(event)" class="p-6 space-y-4">
+                    <input type="hidden" id="editId">
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">Title</label>
+                        <input type="text" id="title" required placeholder="e.g., 1920 Census - John Smith"
+                            class="w-full px-4 py-2 rounded-lg border border-stone-300 focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">URL</label>
+                        <input type="url" id="url" required placeholder="https://..."
+                            class="w-full px-4 py-2 rounded-lg border border-stone-300 focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">Category</label>
+                        <select id="category" required
+                            class="w-full px-4 py-2 rounded-lg border border-stone-300 focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20 outline-none bg-white">
+                            <option value="census">Census Records</option>
+                            <option value="bmd">Birth, Marriage & Death</option>
+                            <option value="immigration">Immigration</option>
+                            <option value="military">Military</option>
+                            <option value="dna">DNA & Genetics</option>
+                            <option value="newspapers">Newspapers</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">Family Members (comma separated)</label>
+                        <input type="text" id="familyMembers" placeholder="e.g., John Smith, Mary Smith"
+                            class="w-full px-4 py-2 rounded-lg border border-stone-300 focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">Notes</label>
+                        <textarea id="notes" rows="3" placeholder="Add any relevant details about this reference..."
+                            class="w-full px-4 py-2 rounded-lg border border-stone-300 focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20 outline-none resize-none"></textarea>
+                    </div>
+
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" onclick="closeModal()" class="flex-1 px-4 py-2 border border-stone-300 rounded-lg text-stone-700 hover:bg-stone-50 font-medium transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" class="flex-1 px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-lg font-medium transition-colors">
+                            Save Reference
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-stone-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 z-50">
+        <i data-lucide="check-circle" class="w-5 h-5 text-green-400"></i>
+        <span id="toastMessage">Action completed</span>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // State management
+        let links = JSON.parse(localStorage.getItem('ancestryLinks')) || [];
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        // Category configuration
+        const categories = {
+            census: { label: 'Census Records', icon: 'users', color: 'bg-blue-100 text-blue-800' },
+            bmd: { label: 'Birth, Marriage & Death', icon: 'heart', color: 'bg-rose-100 text-rose-800' },
+            immigration: { label: 'Immigration', icon: 'plane', color: 'bg-emerald-100 text-emerald-800' },
+            military: { label: 'Military', icon: 'shield', color: 'bg-slate-100 text-slate-800' },
+            dna: { label: 'DNA & Genetics', icon: 'dna', color: 'bg-purple-100 text-purple-800' },
+            newspapers: { label: 'Newspapers', icon: 'newspaper', color: 'bg-amber-100 text-amber-800' },
+            other: { label: 'Other', icon: 'file-text', color: 'bg-stone-100 text-stone-800' }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderLinks();
+            updateStats();
+        });
+
+        function renderLinks() {
+            const container = document.getElementById('linksContainer');
+            const emptyState = document.getElementById('emptyState');
+            
+            // Filter links
+            let filtered = links.filter(link => {
+                const matchesCategory = currentFilter === 'all' || link.category === currentFilter;
+                const matchesSearch = !searchQuery || 
+                    link.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    link.familyMembers?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    link.notes?.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            // Sort by date added (newest first)
+            filtered.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                if (links.length > 0 && searchQuery) {
+                    document.querySelector('#emptyState h3').textContent = 'No matches found';
+                    document.querySelector('#emptyState p').textContent = 'Try adjusting your search or filter.';
+                }
+            } else {
+                emptyState.classList.add('hidden');
+                container.innerHTML = filtered.map(link => {
+                    const cat = categories[link.category] || categories.other;
+                    const date = new Date(link.dateAdded).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                    
+                    return `
+                        <div class="link-card bg-white rounded-xl border border-stone-200 p-5 relative group fade-in">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="p-2 rounded-lg ${cat.color}">
+                                        <i data-lucide="${cat.icon}" class="w-4 h-4"></i>
+                                    </span>
+                                    <span class="text-xs font-medium text-stone-500 uppercase tracking-wider">${cat.label}</span>
+                                </div>
+                                <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onclick="editLink('${link.id}')" class="p-1.5 hover:bg-stone-100 rounded-lg text-stone-500 hover:text-amber-700 transition-colors" title="Edit">
+                                        <i data-lucide="pencil" class="w-4 h-4"></i>
+                                    </button>
+                                    <button onclick="deleteLink('${link.id}')" class="p-1.5 hover:bg-red-50 rounded-lg text-stone-500 hover:text-red-600 transition-colors" title="Delete">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <h3 class="font-semibold text-lg text-stone-900 mb-2 line-clamp-2">${link.title}</h3>
+                            
+                            ${link.familyMembers ? `
+                                <div class="flex items-center gap-2 mb-3 text-sm text-stone-600">
+                                    <i data-lucide="users" class="w-4 h-4 text-stone-400"></i>
+                                    <span class="line-clamp-1">${link.familyMembers}</span>
+                                </div>
+                            ` : ''}
+                            
+                            ${link.notes ? `
+                                <p class="text-sm text-stone-600 mb-4 line-clamp-2">${link.notes}</p>
+                            ` : ''}
+                            
+                            <div class="flex items-center justify-between pt-4 border-t border-stone-100">
+                                <span class="text-xs text-stone-400">${date}</span>
+                                <a href="${link.url}" target="_blank" rel="noopener noreferrer" 
+                                    class="flex items-center gap-1.5 text-sm font-medium text-amber-700 hover:text-amber-800 transition-colors">
+                                    Visit Link
+                                    <i data-lucide="external-link" class="w-4 h-4"></i>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Re-initialize icons for dynamically added content
+                lucide.createIcons();
+            }
+            
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('totalLinks').textContent = `${links.length} reference${links.length !== 1 ? 's' : ''}`;
+            const uniqueCategories = new Set(links.map(l => l.category)).size;
+            document.getElementById('totalCategories').textContent = `${uniqueCategories} categor${uniqueCategories !== 1 ? 'ies' : 'y'}`;
+        }
+
+        function openModal(editId = null) {
+            const modal = document.getElementById('modal');
+            const form = document.getElementById('linkForm');
+            const title = document.getElementById('modalTitle');
+            
+            modal.classList.remove('hidden');
+            
+            if (editId) {
+                const link = links.find(l => l.id === editId);
+                if (link) {
+                    title.textContent = 'Edit Reference';
+                    document.getElementById('editId').value = link.id;
+                    document.getElementById('title').value = link.title;
+                    document.getElementById('url').value = link.url;
+                    document.getElementById('category').value = link.category;
+                    document.getElementById('familyMembers').value = link.familyMembers || '';
+                    document.getElementById('notes').value = link.notes || '';
+                }
+            } else {
+                title.textContent = 'Add Reference';
+                form.reset();
+                document.getElementById('editId').value = '';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        function saveLink(e) {
+            e.preventDefault();
+            
+            const editId = document.getElementById('editId').value;
+            const linkData = {
+                id: editId || Date.now().toString(),
+                title: document.getElementById('title').value,
+                url: document.getElementById('url').value,
+                category: document.getElementById('category').value,
+                familyMembers: document.getElementById('familyMembers').value,
+                notes: document.getElementById('notes').value,
+                dateAdded: editId ? links.find(l => l.id === editId).dateAdded : new Date().toISOString()
+            };
+
+            if (editId) {
+                const index = links.findIndex(l => l.id === editId);
+                if (index !== -1) links[index] = linkData;
+                showToast('Reference updated successfully');
+            } else {
+                links.push(linkData);
+                showToast('Reference added successfully');
+            }
+
+            localStorage.setItem('ancestryLinks', JSON.stringify(links));
+            closeModal();
+            renderLinks();
+        }
+
+        function editLink(id) {
+            openModal(id);
+        }
+
+        function deleteLink(id) {
+            if (confirm('Are you sure you want to delete this reference?')) {
+                links = links.filter(l => l.id !== id);
+                localStorage.setItem('ancestryLinks', JSON.stringify(links));
+                renderLinks();
+                showToast('Reference deleted');
+            }
+        }
+
+        function filterByCategory(category) {
+            currentFilter = category;
+            
+            // Update button styles
+            document.querySelectorAll('#categoryFilters button').forEach(btn => {
+                if (btn.dataset.category === category) {
+                    btn.className = 'category-badge px-4 py-1.5 rounded-full text-sm font-medium bg-amber-700 text-white shadow-md';
+                } else {
+                    btn.className = 'category-badge px-4 py-1.5 rounded-full text-sm font-medium bg-white text-stone-700 border border-stone-300 hover:border-amber-700 hover:text-amber-700';
+                }
+            });
+            
+            renderLinks();
+        }
+
+        function filterLinks() {
+            searchQuery = document.getElementById('searchInput').value;
+            renderLinks();
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+<script src="https://deepsite.hf.co/deepsite-badge.js"></script>
+</body>
+</html>
